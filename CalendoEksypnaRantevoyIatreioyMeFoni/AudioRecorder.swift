@@ -70,8 +70,11 @@ final class AudioRecorder {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let url = directory.appendingPathComponent("\(UUID().uuidString).m4a")
         let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.record, mode: .spokenAudio, options: [.duckOthers])
-        try session.setActive(true, options: .notifyOthersOnDeactivation)
+        // `.duckOthers` and `.spokenAudio` are not valid together with the record-only
+        // category on physical iPhones (it produces OSStatus -50). A measurement session
+        // is purpose-built for clear mono microphone capture and does not alter other audio.
+        try session.setCategory(.record, mode: .measurement, options: [])
+        try session.setActive(true, options: [])
         let settings: [String: Any] = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
             AVSampleRateKey: 44_100,
