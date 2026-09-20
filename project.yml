@@ -1,0 +1,67 @@
+name: CalendoEksypnaRantevoyIatreioyMeFoni
+options:
+  bundleIdPrefix: com.superapp
+  developmentLanguage: el
+
+settings:
+  base:
+    PRODUCT_NAME: Calendo
+    SWIFT_VERSION: 6.0
+    MARKETING_VERSION: 1.0
+    CURRENT_PROJECT_VERSION: 1
+    SUPPORTED_PLATFORMS: iphoneos iphonesimulator
+    TARGETED_DEVICE_FAMILY: '1'
+    SUPPORTS_MACCATALYST: NO
+    ALWAYS_SEARCH_USER_PATHS: NO
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+  configs:
+    Release:
+      SWIFT_OPTIMIZATION_LEVEL: '-O'
+      SWIFT_COMPILATION_MODE: wholemodule
+      ENABLE_NS_ASSERTIONS: NO
+
+targets:
+  CalendoEksypnaRantevoyIatreioyMeFoni:
+    type: application
+    platform: iOS
+    deploymentTarget: '17.0'
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.superapp.calendo
+    sources:
+      - path: CalendoEksypnaRantevoyIatreioyMeFoni
+    info:
+      path: CalendoEksypnaRantevoyIatreioyMeFoni/Info.plist
+      properties:
+        CFBundleDevelopmentRegion: $(DEVELOPMENT_LANGUAGE)
+        CFBundleDisplayName: $(PRODUCT_NAME)
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleInfoDictionaryVersion: 6.0
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundlePackageType: $(PRODUCT_BUNDLE_PACKAGE_TYPE)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleIconName: AppIcon
+        ITSAppUsesNonExemptEncryption: false
+        LSRequiresIPhoneOS: true
+        UIApplicationSupportsIndirectInputEvents: true
+        UILaunchStoryboardName: LaunchScreen
+        NSMicrophoneUsageDescription: Το Calendo χρειάζεται το μικρόφωνο για να ηχογραφήσει τα στοιχεία του ραντεβού.
+        CFBundleURLTypes:
+          - CFBundleTypeRole: Editor
+            CFBundleURLSchemes:
+              - com.googleusercontent.apps.718756612878-vgbmspg71o536u77bg42k3rkolm4gfnb
+        UIRequiredDeviceCapabilities: [arm64]
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+
+schemes:
+  CalendoEksypnaRantevoyIatreioyMeFoni:
+    build:
+      targets:
+        CalendoEksypnaRantevoyIatreioyMeFoni: all
+    run:
+      config: Debug
+    archive:
+      config: Release

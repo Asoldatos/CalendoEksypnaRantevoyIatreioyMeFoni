@@ -1,0 +1,258 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		25F2D7AF4B5B00176EEAFDC3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4826CFAB712F0162AE531B1F /* LaunchScreen.storyboard */; };
+		2893720AE45129DB5D5C8ADE /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91C9D91A863296D48009CE2 /* OnboardingView.swift */; };
+		2E380D10874EA87E8D3CCC64 /* NewRecordingIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA7A7EA8A528BEFE30F2FDA /* NewRecordingIntent.swift */; };
+		33ECD24E0B6396F9CB24E395 /* AppointmentDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C95D55E1C398E0D612635 /* AppointmentDraft.swift */; };
+		485CD2CF3427EC5D7E03BC24 /* CalendoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F5C9CB3AD49F24965C42FC /* CalendoApp.swift */; };
+		4937B16CDFBF9843C80FB210 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E66C2F01E47428762F91BE2 /* ReviewView.swift */; };
+		6E353B2261AF8257A02679BF /* RecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6123C2EB8CB0895AFE0025DE /* RecordingView.swift */; };
+		7AFC0DAEC7CA631D4A0E6D49 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C149983A50779DB80AC7702 /* AudioRecorder.swift */; };
+		AA63874B2040328E4B29F9CF /* GoogleServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A649CEF06C424385B9A76BA /* GoogleServices.swift */; };
+		C0467D41DC86A8A34DC54EDD /* SavedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C0979619EAE9162ADEE7C5 /* SavedView.swift */; };
+		C613B923BCE7672C1AE20E74 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 570563B8A62EE9EF96791033 /* Assets.xcassets */; };
+		C66D5C1428803F79BDA49781 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FAC237E89AE463808BCA753 /* RootView.swift */; };
+		CE15AB6D15CEF1C11BAAB67F /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473DE90E085F110488EA6524 /* HomeView.swift */; };
+		F40559E5B05909E8B25DD5BC /* CalendoStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4F55110F0B9B2CA47034B2 /* CalendoStyle.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		14544561DDD886B82FF5873C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		1C149983A50779DB80AC7702 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
+		30C0979619EAE9162ADEE7C5 /* SavedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedView.swift; sourceTree = "<group>"; };
+		3FAC237E89AE463808BCA753 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		42F5C9CB3AD49F24965C42FC /* CalendoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendoApp.swift; sourceTree = "<group>"; };
+		473DE90E085F110488EA6524 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		570563B8A62EE9EF96791033 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5E66C2F01E47428762F91BE2 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
+		6123C2EB8CB0895AFE0025DE /* RecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingView.swift; sourceTree = "<group>"; };
+		6B4F55110F0B9B2CA47034B2 /* CalendoStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendoStyle.swift; sourceTree = "<group>"; };
+		7C36E9CCB5B16A66DED123EF /* CalendoEksypnaRantevoyIatreioyMeFoni.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CalendoEksypnaRantevoyIatreioyMeFoni.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8FA7A7EA8A528BEFE30F2FDA /* NewRecordingIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRecordingIntent.swift; sourceTree = "<group>"; };
+		9A649CEF06C424385B9A76BA /* GoogleServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleServices.swift; sourceTree = "<group>"; };
+		A72C95D55E1C398E0D612635 /* AppointmentDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentDraft.swift; sourceTree = "<group>"; };
+		AA109323BF3ECE89950F6558 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		E91C9D91A863296D48009CE2 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		53168CDB0CFBD8A8719AC407 /* CalendoEksypnaRantevoyIatreioyMeFoni */ = {
+			isa = PBXGroup;
+			children = (
+				A72C95D55E1C398E0D612635 /* AppointmentDraft.swift */,
+				570563B8A62EE9EF96791033 /* Assets.xcassets */,
+				1C149983A50779DB80AC7702 /* AudioRecorder.swift */,
+				42F5C9CB3AD49F24965C42FC /* CalendoApp.swift */,
+				6B4F55110F0B9B2CA47034B2 /* CalendoStyle.swift */,
+				9A649CEF06C424385B9A76BA /* GoogleServices.swift */,
+				473DE90E085F110488EA6524 /* HomeView.swift */,
+				AA109323BF3ECE89950F6558 /* Info.plist */,
+				8FA7A7EA8A528BEFE30F2FDA /* NewRecordingIntent.swift */,
+				E91C9D91A863296D48009CE2 /* OnboardingView.swift */,
+				6123C2EB8CB0895AFE0025DE /* RecordingView.swift */,
+				5E66C2F01E47428762F91BE2 /* ReviewView.swift */,
+				3FAC237E89AE463808BCA753 /* RootView.swift */,
+				30C0979619EAE9162ADEE7C5 /* SavedView.swift */,
+				4826CFAB712F0162AE531B1F /* LaunchScreen.storyboard */,
+			);
+			path = CalendoEksypnaRantevoyIatreioyMeFoni;
+			sourceTree = "<group>";
+		};
+		6ED09509BF3E0C96D6608288 = {
+			isa = PBXGroup;
+			children = (
+				53168CDB0CFBD8A8719AC407 /* CalendoEksypnaRantevoyIatreioyMeFoni */,
+				EEF11323185C5F52EA9AD3F3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		EEF11323185C5F52EA9AD3F3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7C36E9CCB5B16A66DED123EF /* CalendoEksypnaRantevoyIatreioyMeFoni.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7359FD3426F8F9AC6F88ABCA /* CalendoEksypnaRantevoyIatreioyMeFoni */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A813685BD387920F7BDACB24 /* Build configuration list for PBXNativeTarget "CalendoEksypnaRantevoyIatreioyMeFoni" */;
+			buildPhases = (
+				E927065F19206B40D2270F36 /* Sources */,
+				54617561190CA9B752B5ED24 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CalendoEksypnaRantevoyIatreioyMeFoni;
+			packageProductDependencies = (
+			);
+			productName = CalendoEksypnaRantevoyIatreioyMeFoni;
+			productReference = 7C36E9CCB5B16A66DED123EF /* CalendoEksypnaRantevoyIatreioyMeFoni.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7983268D648A70A7A8DFB056 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 947000CAF0204CC57722123F /* Build configuration list for PBXProject "CalendoEksypnaRantevoyIatreioyMeFoni" */;
+			developmentRegion = el;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				el,
+			);
+			mainGroup = 6ED09509BF3E0C96D6608288;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = EEF11323185C5F52EA9AD3F3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7359FD3426F8F9AC6F88ABCA /* CalendoEksypnaRantevoyIatreioyMeFoni */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		54617561190CA9B752B5ED24 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C613B923BCE7672C1AE20E74 /* Assets.xcassets in Resources */,
+				25F2D7AF4B5B00176EEAFDC3 /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E927065F19206B40D2270F36 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33ECD24E0B6396F9CB24E395 /* AppointmentDraft.swift in Sources */,
+				7AFC0DAEC7CA631D4A0E6D49 /* AudioRecorder.swift in Sources */,
+				485CD2CF3427EC5D7E03BC24 /* CalendoApp.swift in Sources */,
+				F40559E5B05909E8B25DD5BC /* CalendoStyle.swift in Sources */,
+				AA63874B2040328E4B29F9CF /* GoogleServices.swift in Sources */,
+				CE15AB6D15CEF1C11BAAB67F /* HomeView.swift in Sources */,
+				2E380D10874EA87E8D3CCC64 /* NewRecordingIntent.swift in Sources */,
+				2893720AE45129DB5D5C8ADE /* OnboardingView.swift in Sources */,
+				6E353B2261AF8257A02679BF /* RecordingView.swift in Sources */,
+				4937B16CDFBF9843C80FB210 /* ReviewView.swift in Sources */,
+				C66D5C1428803F79BDA49781 /* RootView.swift in Sources */,
+				C0467D41DC86A8A34DC54EDD /* SavedView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		4826CFAB712F0162AE531B1F /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				14544561DDD886B82FF5873C /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3DE1303DD3E7275830648A7D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = CalendoEksypnaRantevoyIatreioyMeFoni/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.superapp.calendo;
+			};
+			name = Debug;
+		};
+		937C1B6E3731823465E33433 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = Calendo;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B5A3662A13A08B8384173845 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_NS_ASSERTIONS = NO;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = Calendo;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		FDAAD14A3050858FED89B1B6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = CalendoEksypnaRantevoyIatreioyMeFoni/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.superapp.calendo;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		947000CAF0204CC57722123F /* Build configuration list for PBXProject "CalendoEksypnaRantevoyIatreioyMeFoni" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				937C1B6E3731823465E33433 /* Debug */,
+				B5A3662A13A08B8384173845 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A813685BD387920F7BDACB24 /* Build configuration list for PBXNativeTarget "CalendoEksypnaRantevoyIatreioyMeFoni" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DE1303DD3E7275830648A7D /* Debug */,
+				FDAAD14A3050858FED89B1B6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7983268D648A70A7A8DFB056 /* Project object */;
+}
