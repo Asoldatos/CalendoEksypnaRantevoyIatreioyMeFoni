@@ -109,8 +109,16 @@ struct ReviewView: View {
             let token = try await store.google.validAccessToken()
             let result = try await GeminiAppointmentService().analyze(audioURL: audioURL, token: token)
             store.applyAI(result, to: &draft)
+        } catch {
+            let geminiMessage = error.localizedDescription
+            do {
+                let localResult = try await LocalAppointmentFallback().analyze(audioURL: audioURL)
+                store.applyAI(localResult, to: &draft)
+                self.error = "Το Gemini δεν ήταν διαθέσιμο: \(geminiMessage)\n\nΧρησιμοποιήθηκε η τοπική ελληνική εναλλακτική ανάλυση. Ελέγξτε τα πεδία πριν τη δημιουργία του ραντεβού."
+            } catch {
+                self.error = "Το Gemini δεν ήταν διαθέσιμο: \(geminiMessage)\n\nΗ τοπική εναλλακτική ανάλυση δεν ολοκληρώθηκε. Συμπληρώστε τα πεδία χειροκίνητα."
+            }
         }
-        catch { self.error = "Δεν ολοκληρώθηκε η αυτόματη ανάλυση. Μπορείτε να συμπληρώσετε τα στοιχεία χειροκίνητα." }
     }
 
     private func createEvent() {

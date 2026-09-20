@@ -161,6 +161,16 @@ final class GoogleSession: NSObject, ASWebAuthenticationPresentationContextProvi
     private static func challenge(for verifier: String) -> String { Data(SHA256.hash(data: Data(verifier.utf8))).base64EncodedString().base64URLSafe }
 }
 
+enum GeminiAnalysisError: LocalizedError {
+    case service(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .service(let message): message
+        }
+    }
+}
+
 struct GeminiAppointmentService {
     func analyze(audioURL: URL, token: String) async throws -> AIAppointmentResult {
         let audio = try Data(contentsOf: audioURL)
@@ -175,11 +185,20 @@ struct GeminiAppointmentService {
             "referenceDate": AthensDateFormatter.dateString(from: .now)
         ])
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw GoogleServiceError.requestFailed }
-        return try JSONDecoder().decode(AIAppointmentResult.self, from: data)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard status == 200 else {
+            let message = (try? JSONDecoder().decode(CloudFailure.self, from: data).error) ?? "Το Gemini δεν απάντησε (κωδικός \(status))."
+            throw GeminiAnalysisError.service(message)
+        }
+        do {
+            return try JSONDecoder().decode(AIAppointmentResult.self, from: data)
+        } catch {
+            throw GeminiAnalysisError.service("Το Gemini επέστρεψε μη αναγνώσιμη απάντηση. Δοκιμάστε ξανά.")
+        }
     }
 }
 
+private struct CloudFailure: Decodable { let error: String }
 private struct TokenResponse: Decodable {
     let accessToken: String
     let refreshToken: String?

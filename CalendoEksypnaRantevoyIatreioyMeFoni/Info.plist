@@ -39,6 +39,8 @@
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Το Calendo χρειάζεται το μικρόφωνο για να ηχογραφήσει τα στοιχεία του ραντεβού.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Το Calendo χρησιμοποιεί την ελληνική Αναγνώριση ομιλίας μόνο ως τοπική εναλλακτική ανάλυση όταν το Gemini δεν είναι διαθέσιμο.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

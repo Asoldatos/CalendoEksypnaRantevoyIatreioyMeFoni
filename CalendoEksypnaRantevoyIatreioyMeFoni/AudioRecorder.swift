@@ -70,11 +70,8 @@ final class AudioRecorder {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let url = directory.appendingPathComponent("\(UUID().uuidString).m4a")
         let session = AVAudioSession.sharedInstance()
-        // `.duckOthers` and `.spokenAudio` are not valid together with the record-only
-        // category on physical iPhones (it produces OSStatus -50). A measurement session
-        // is purpose-built for clear mono microphone capture and does not alter other audio.
-        try session.setCategory(.record, mode: .measurement, options: [])
-        try session.setActive(true, options: [])
+        try configure(session)
+        guard session.isInputAvailable else { throw RecorderError.couldNotStart }
         let settings: [String: Any] = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
             AVSampleRateKey: 44_100,
@@ -92,6 +89,19 @@ final class AudioRecorder {
         isPaused = false
         isInterrupted = false
         startTimer()
+    }
+
+    private func configure(_ session: AVAudioSession) throws {
+        do {
+            // The minimal route is the most reliable capture configuration across iPhones.
+            try session.setCategory(.record, mode: .default, options: [])
+            try session.setActive(true, options: .notifyOthersOnDeactivation)
+        } catch {
+            NSLog("Calendo minimal microphone route failed: %@", error.localizedDescription)
+            // Bluetooth/headphone routes occasionally require the broader category.
+            try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
+            try session.setActive(true, options: .notifyOthersOnDeactivation)
+        }
     }
 
     private func startTimer() {
