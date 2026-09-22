@@ -47,15 +47,24 @@ final class AppStore {
 
     func startRecording() { editingDraft = .blank; path = [.recording] }
 
-    func reviewRecording(at audioURL: URL?) {
+    func reviewRecording(audioURL: URL, transcript: String) {
         var draft = editingDraft ?? .blank
-        draft.audioFileName = audioURL?.lastPathComponent
+        draft.audioFileName = audioURL.lastPathComponent
+        draft.transcript = transcript
+        editingDraft = draft
+        path = [.review]
+    }
+
+    func reviewManually() {
+        var draft = editingDraft ?? .blank
+        draft.transcript = nil
         editingDraft = draft
         path = [.review]
     }
 
     func applyAI(_ result: AIAppointmentResult, to draft: inout AppointmentDraft) {
         if !result.patientName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { draft.patientName = result.patientName }
+        if !result.telephone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { draft.telephone = result.telephone }
         if let date = Self.appointmentDate(day: result.dateISO, time: result.time) { draft.startDate = date }
         if (5...240).contains(result.durationMinutes) { draft.durationMinutes = result.durationMinutes }
     }

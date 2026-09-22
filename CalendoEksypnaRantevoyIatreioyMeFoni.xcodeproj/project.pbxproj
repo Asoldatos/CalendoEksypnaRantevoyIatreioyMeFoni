@@ -11,10 +11,12 @@
 		2893720AE45129DB5D5C8ADE /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91C9D91A863296D48009CE2 /* OnboardingView.swift */; };
 		2E380D10874EA87E8D3CCC64 /* NewRecordingIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA7A7EA8A528BEFE30F2FDA /* NewRecordingIntent.swift */; };
 		33ECD24E0B6396F9CB24E395 /* AppointmentDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C95D55E1C398E0D612635 /* AppointmentDraft.swift */; };
+		344E05E4B37189856C322CE8 /* ModernSpeechSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8EA2EC7179134662C64A24B /* ModernSpeechSession.swift */; };
 		485CD2CF3427EC5D7E03BC24 /* CalendoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F5C9CB3AD49F24965C42FC /* CalendoApp.swift */; };
 		4937B16CDFBF9843C80FB210 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E66C2F01E47428762F91BE2 /* ReviewView.swift */; };
 		6E353B2261AF8257A02679BF /* RecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6123C2EB8CB0895AFE0025DE /* RecordingView.swift */; };
 		7AFC0DAEC7CA631D4A0E6D49 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C149983A50779DB80AC7702 /* AudioRecorder.swift */; };
+		A185E944AFD5CE6BE2BEDBB1 /* SpeechAudioBufferConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A98D25D4A910A4AA8588B55F /* SpeechAudioBufferConverter.swift */; };
 		AA63874B2040328E4B29F9CF /* GoogleServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A649CEF06C424385B9A76BA /* GoogleServices.swift */; };
 		C0467D41DC86A8A34DC54EDD /* SavedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C0979619EAE9162ADEE7C5 /* SavedView.swift */; };
 		C613B923BCE7672C1AE20E74 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 570563B8A62EE9EF96791033 /* Assets.xcassets */; };
@@ -40,7 +42,9 @@
 		8FA7A7EA8A528BEFE30F2FDA /* NewRecordingIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRecordingIntent.swift; sourceTree = "<group>"; };
 		9A649CEF06C424385B9A76BA /* GoogleServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleServices.swift; sourceTree = "<group>"; };
 		A72C95D55E1C398E0D612635 /* AppointmentDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentDraft.swift; sourceTree = "<group>"; };
+		A98D25D4A910A4AA8588B55F /* SpeechAudioBufferConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechAudioBufferConverter.swift; sourceTree = "<group>"; };
 		AA109323BF3ECE89950F6558 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		D8EA2EC7179134662C64A24B /* ModernSpeechSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernSpeechSession.swift; sourceTree = "<group>"; };
 		E91C9D91A863296D48009CE2 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -57,12 +61,14 @@
 				473DE90E085F110488EA6524 /* HomeView.swift */,
 				AA109323BF3ECE89950F6558 /* Info.plist */,
 				565F6A223DDFEEB7A1C56FF8 /* LocalAppointmentFallback.swift */,
+				D8EA2EC7179134662C64A24B /* ModernSpeechSession.swift */,
 				8FA7A7EA8A528BEFE30F2FDA /* NewRecordingIntent.swift */,
 				E91C9D91A863296D48009CE2 /* OnboardingView.swift */,
 				6123C2EB8CB0895AFE0025DE /* RecordingView.swift */,
 				5E66C2F01E47428762F91BE2 /* ReviewView.swift */,
 				3FAC237E89AE463808BCA753 /* RootView.swift */,
 				30C0979619EAE9162ADEE7C5 /* SavedView.swift */,
+				A98D25D4A910A4AA8588B55F /* SpeechAudioBufferConverter.swift */,
 				4826CFAB712F0162AE531B1F /* LaunchScreen.storyboard */,
 			);
 			path = CalendoEksypnaRantevoyIatreioyMeFoni;
@@ -159,12 +165,14 @@
 				AA63874B2040328E4B29F9CF /* GoogleServices.swift in Sources */,
 				CE15AB6D15CEF1C11BAAB67F /* HomeView.swift in Sources */,
 				F7FB00D51317E01E3DC5DC42 /* LocalAppointmentFallback.swift in Sources */,
+				344E05E4B37189856C322CE8 /* ModernSpeechSession.swift in Sources */,
 				2E380D10874EA87E8D3CCC64 /* NewRecordingIntent.swift in Sources */,
 				2893720AE45129DB5D5C8ADE /* OnboardingView.swift in Sources */,
 				6E353B2261AF8257A02679BF /* RecordingView.swift in Sources */,
 				4937B16CDFBF9843C80FB210 /* ReviewView.swift in Sources */,
 				C66D5C1428803F79BDA49781 /* RootView.swift in Sources */,
 				C0467D41DC86A8A34DC54EDD /* SavedView.swift in Sources */,
+				A185E944AFD5CE6BE2BEDBB1 /* SpeechAudioBufferConverter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

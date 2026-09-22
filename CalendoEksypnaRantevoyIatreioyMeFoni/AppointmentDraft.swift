@@ -16,6 +16,7 @@ struct AppointmentDraft: Codable, Identifiable, Hashable, Sendable {
     let createdAt: Date
     var updatedAt: Date
     var audioFileName: String?
+    var transcript: String? = nil
 
     var endDate: Date { Calendar.current.date(byAdding: .minute, value: durationMinutes, to: startDate) ?? startDate }
     var calendarTitle: String {

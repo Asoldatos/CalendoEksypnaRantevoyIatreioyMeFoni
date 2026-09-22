@@ -47,8 +47,7 @@ targets:
         LSRequiresIPhoneOS: true
         UIApplicationSupportsIndirectInputEvents: true
         UILaunchStoryboardName: LaunchScreen
-        NSMicrophoneUsageDescription: Το Calendo χρειάζεται το μικρόφωνο για να ηχογραφήσει τα στοιχεία του ραντεβού.
-        NSSpeechRecognitionUsageDescription: Το Calendo χρησιμοποιεί την ελληνική Αναγνώριση ομιλίας μόνο ως τοπική εναλλακτική ανάλυση όταν το Gemini δεν είναι διαθέσιμο.
+        NSMicrophoneUsageDescription: Το Calendo χρησιμοποιεί το μικρόφωνο για να ηχογραφήσει την υπαγόρευση του ραντεβού και να τη μετατρέψει σε κείμενο μέσω AssemblyAI.
         CFBundleURLTypes:
           - CFBundleTypeRole: Editor
             CFBundleURLSchemes:

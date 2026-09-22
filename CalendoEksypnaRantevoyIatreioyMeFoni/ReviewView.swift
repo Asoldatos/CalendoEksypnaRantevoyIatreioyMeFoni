@@ -3,7 +3,6 @@ import SwiftUI
 struct ReviewView: View {
     let store: AppStore
     @State private var draft: AppointmentDraft
-    @State private var player = AudioPreviewPlayer()
     @State private var error: String?
     @State private var isAnalyzing = false
     @State private var isCreating = false
@@ -26,7 +25,7 @@ struct ReviewView: View {
                     if isAnalyzing { analysisProgress }
                     titlePreview
                     detailsCard
-                    if let url = draft.audioURL { audioCard(url) }
+                    if let transcript = draft.transcript, !transcript.isEmpty { transcriptCard(transcript) }
                     createButton
                 }.padding(20).padding(.bottom, 24)
             }.scrollDismissesKeyboard(.interactively)
@@ -47,7 +46,7 @@ struct ReviewView: View {
     }
 
     private var analysisProgress: some View {
-        HStack(spacing: 12) { ProgressView(); Text("Ανάλυση ελληνικής ηχογράφησης με Gemini…").font(.subheadline) }
+        HStack(spacing: 12) { ProgressView(); Text("Το Gemini οργανώνει τα στοιχεία της μεταγραφής…").font(.subheadline) }
             .frame(maxWidth: .infinity, alignment: .leading).clinicalCard()
     }
 
@@ -88,10 +87,17 @@ struct ReviewView: View {
         }
     }
 
-    private func audioCard(_ url: URL) -> some View {
-        Button { player.toggle(url: url) } label: {
-            HStack { Image(systemName: player.isPlaying ? "stop.circle.fill" : "play.circle.fill").font(.title2).foregroundStyle(CalendoColor.teal); VStack(alignment: .leading) { Text(player.isPlaying ? "Διακοπή αναπαραγωγής" : "Ακούστε την εγγραφή").font(.headline).foregroundStyle(.primary); Text("Διαγράφεται από τον server μετά την ανάλυση.").font(.caption).foregroundStyle(.secondary) }; Spacer() }
-        }.buttonStyle(.plain).clinicalCard()
+    private func transcriptCard(_ transcript: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("ΜΕΤΑΓΡΑΦΗ ASSEMBLYAI", systemImage: "text.quote")
+                .font(.caption.bold()).foregroundStyle(CalendoColor.teal)
+            Text(transcript)
+                .font(.subheadline).foregroundStyle(.secondary)
+            Text("Η εγγραφή μεταγράφηκε από το AssemblyAI. Μόνο αυτό το κείμενο οργανώνεται από το Gemini.")
+                .font(.caption).foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .clinicalCard()
     }
 
     private var createButton: some View {
@@ -102,22 +108,20 @@ struct ReviewView: View {
     }
 
     private func analyzeIfNeeded() async {
-        guard !didAnalyze, let audioURL = draft.audioURL else { return }
-        didAnalyze = true; isAnalyzing = true
+        guard !didAnalyze,
+              let transcript = draft.transcript?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !transcript.isEmpty else { return }
+        didAnalyze = true
+        isAnalyzing = true
         defer { isAnalyzing = false }
+
         do {
+            // AssemblyAI creates the transcript; Gemini receives only text.
             let token = try await store.google.validAccessToken()
-            let result = try await GeminiAppointmentService().analyze(audioURL: audioURL, token: token)
+            let result = try await GeminiAppointmentService().analyze(transcript: transcript, token: token)
             store.applyAI(result, to: &draft)
         } catch {
-            let geminiMessage = error.localizedDescription
-            do {
-                let localResult = try await LocalAppointmentFallback().analyze(audioURL: audioURL)
-                store.applyAI(localResult, to: &draft)
-                self.error = "Το Gemini δεν ήταν διαθέσιμο: \(geminiMessage)\n\nΧρησιμοποιήθηκε η τοπική ελληνική εναλλακτική ανάλυση. Ελέγξτε τα πεδία πριν τη δημιουργία του ραντεβού."
-            } catch {
-                self.error = "Το Gemini δεν ήταν διαθέσιμο: \(geminiMessage)\n\nΗ τοπική εναλλακτική ανάλυση δεν ολοκληρώθηκε. Συμπληρώστε τα πεδία χειροκίνητα."
-            }
+            self.error = error.localizedDescription + "\n\nΜπορείτε να συμπληρώσετε ή να διορθώσετε τα πεδία χειροκίνητα."
         }
     }
 

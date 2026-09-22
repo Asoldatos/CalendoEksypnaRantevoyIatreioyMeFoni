@@ -11,6 +11,7 @@ struct GoogleCalendar: Identifiable, Codable, Hashable {
 
 struct AIAppointmentResult: Decodable {
     let patientName: String
+    let telephone: String
     let dateISO: String
     let time: String
     let durationMinutes: Int
@@ -161,7 +162,7 @@ final class GoogleSession: NSObject, ASWebAuthenticationPresentationContextProvi
     private static func challenge(for verifier: String) -> String { Data(SHA256.hash(data: Data(verifier.utf8))).base64EncodedString().base64URLSafe }
 }
 
-enum GeminiAnalysisError: LocalizedError {
+enum CloudProcessingError: LocalizedError {
     case service(String)
 
     var errorDescription: String? {
@@ -171,33 +172,57 @@ enum GeminiAnalysisError: LocalizedError {
     }
 }
 
+struct AssemblyAITranscriptionService {
+    func transcribe(audioURL: URL, token: String) async throws -> String {
+        var request = URLRequest(url: URL(string: "https://cbmjymirgxevmyzyedqr.supabase.co/functions/v1/transcribe-appointment-audio")!)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 120
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("audio/mp4", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try Data(contentsOf: audioURL, options: .mappedIfSafe)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard status == 200 else {
+            let message = (try? JSONDecoder().decode(CloudFailure.self, from: data).error)
+                ?? "Η μετατροπή της ομιλίας απέτυχε (κωδικός \(status))."
+            throw CloudProcessingError.service(message)
+        }
+        guard let result = try? JSONDecoder().decode(AssemblyAITranscript.self, from: data),
+              !result.transcript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw CloudProcessingError.service("Δεν αναγνωρίστηκε ομιλία στην εγγραφή. Δοκιμάστε ξανά μιλώντας καθαρά.")
+        }
+        return result.transcript
+    }
+}
+
 struct GeminiAppointmentService {
-    func analyze(audioURL: URL, token: String) async throws -> AIAppointmentResult {
-        let audio = try Data(contentsOf: audioURL)
-        let mime = audioURL.pathExtension.lowercased() == "m4a" ? "audio/mp4" : "audio/m4a"
+    func analyze(transcript: String, token: String) async throws -> AIAppointmentResult {
         var request = URLRequest(url: URL(string: "https://cbmjymirgxevmyzyedqr.supabase.co/functions/v1/process-appointment-audio")!)
         request.httpMethod = "POST"
-        request.timeoutInterval = 60
+        request.timeoutInterval = 45
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: [
-            "audioBase64": audio.base64EncodedString(), "mimeType": mime,
-            "referenceDate": AthensDateFormatter.dateString(from: .now)
+            "transcript": transcript,
+            "referenceDate": AthensDateFormatter.dateString(from: .now),
+            "timeZone": "Europe/Athens"
         ])
         let (data, response) = try await URLSession.shared.data(for: request)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         guard status == 200 else {
             let message = (try? JSONDecoder().decode(CloudFailure.self, from: data).error) ?? "Το Gemini δεν απάντησε (κωδικός \(status))."
-            throw GeminiAnalysisError.service(message)
+            throw CloudProcessingError.service(message)
         }
         do {
             return try JSONDecoder().decode(AIAppointmentResult.self, from: data)
         } catch {
-            throw GeminiAnalysisError.service("Το Gemini επέστρεψε μη αναγνώσιμη απάντηση. Δοκιμάστε ξανά.")
+            throw CloudProcessingError.service("Το Gemini επέστρεψε μη αναγνώσιμη απάντηση. Δοκιμάστε ξανά.")
         }
     }
 }
 
+private struct AssemblyAITranscript: Decodable { let transcript: String }
 private struct CloudFailure: Decodable { let error: String }
 private struct TokenResponse: Decodable {
     let accessToken: String

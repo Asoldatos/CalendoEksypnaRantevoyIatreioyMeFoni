@@ -5,10 +5,11 @@ import UIKit
 
 struct RecordingView: View {
     let store: AppStore
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @State private var recorder = AudioRecorder()
     @State private var errorMessage: String?
+    @State private var pendingAudioURL: URL?
+    @State private var isTranscribing = false
 
     var body: some View {
         ZStack {
@@ -27,13 +28,18 @@ struct RecordingView: View {
         .navigationBarBackButtonHidden()
         .task { await beginRecording() }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .background, let url = recorder.handleBackgrounding() {
-                store.reviewRecording(at: url)
-            }
+            if phase == .background { recorder.handleBackgrounding() }
         }
-        .alert("Μικρόφωνο", isPresented: errorBinding) {
+        .onChange(of: recorder.runtimeError) { _, message in
+            if let message { errorMessage = message }
+        }
+        .alert("Δεν ολοκληρώθηκε", isPresented: errorBinding) {
+            if pendingAudioURL != nil {
+                Button("Νέα προσπάθεια μετατροπής") { Task { await transcribePendingRecording() } }
+            }
+            Button("Χειροκίνητη συμπλήρωση") { continueManually() }
             Button("Ρυθμίσεις") { openSettings() }
-            Button("Χειροκίνητη συμπλήρωση") { store.reviewRecording(at: nil) }
+            Button("Ακύρωση", role: .cancel) {}
         } message: {
             Text(errorMessage ?? "Δεν είναι διαθέσιμη η εγγραφή.")
         }
@@ -42,14 +48,16 @@ struct RecordingView: View {
     private var recordingHeader: some View {
         HStack {
             Button("Ακύρωση") {
+                discardPendingRecording()
                 recorder.cancel()
                 store.finishFlow()
             }
             .foregroundStyle(.secondary)
+            .disabled(isTranscribing)
             Spacer()
-            Label(recorder.isPaused ? "Σε παύση" : "Ηχογράφηση", systemImage: "circle.fill")
+            Label(recordingStatus, systemImage: statusIcon)
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(recorder.isPaused ? .orange : .red)
+                .foregroundStyle(isTranscribing ? CalendoColor.teal : (recorder.isRecording ? .red : .secondary))
         }
     }
 
@@ -62,10 +70,15 @@ struct RecordingView: View {
 
     private var prompt: some View {
         VStack(spacing: 8) {
-            Text("Μιλήστε φυσικά στα ελληνικά")
+            Text(isTranscribing ? "Μετατροπή σε κείμενο…" : "Μιλήστε φυσικά στα ελληνικά")
                 .font(.title2.bold())
-            Text("«Αύριο στις δέκα, Μαρία Κωνσταντίνου, για σαράντα πέντε λεπτά»")
-                .font(.body).foregroundStyle(.secondary).multilineTextAlignment(.center)
+            Text(isTranscribing
+                 ? "Το AssemblyAI μετατρέπει με ασφάλεια την εγγραφή σας."
+                 : "«Αύριο στις δέκα, Μαρία Κωνσταντίνου, για σαράντα πέντε λεπτά»")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            if isTranscribing { ProgressView().padding(.top, 8) }
         }
     }
 
@@ -78,17 +91,28 @@ struct RecordingView: View {
                     .font(.title2).frame(width: 58, height: 58)
             }
             .buttonStyle(.bordered)
+            .disabled(!recorder.isRecording || isTranscribing)
             .accessibilityLabel(recorder.isPaused ? "Συνέχεια εγγραφής" : "Παύση εγγραφής")
 
             Button {
-                let url = recorder.finish()
-                store.reviewRecording(at: url)
+                Task { await finishAndTranscribe() }
             } label: {
                 Label("Τέλος", systemImage: "checkmark")
                     .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 9)
             }
             .primaryActionStyle()
+            .disabled(!recorder.isRecording || isTranscribing)
         }
+    }
+
+    private var recordingStatus: String {
+        if isTranscribing { return "Μετατροπή με AssemblyAI" }
+        if !recorder.isRecording { return "Προετοιμασία μικροφώνου" }
+        return recorder.isPaused ? "Σε παύση" : "Ηχογράφηση"
+    }
+
+    private var statusIcon: String {
+        isTranscribing ? "waveform.badge.magnifyingglass" : (recorder.isRecording ? "circle.fill" : "hourglass")
     }
 
     private var formattedElapsed: String {
@@ -103,6 +127,41 @@ struct RecordingView: View {
     private func beginRecording() async {
         do { try await recorder.requestPermissionAndStart() }
         catch { errorMessage = error.localizedDescription }
+    }
+
+    private func finishAndTranscribe() async {
+        do {
+            pendingAudioURL = try recorder.finish()
+            await transcribePendingRecording()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func transcribePendingRecording() async {
+        guard let audioURL = pendingAudioURL, !isTranscribing else { return }
+        isTranscribing = true
+        defer { isTranscribing = false }
+        do {
+            let token = try await store.google.validAccessToken()
+            let transcript = try await AssemblyAITranscriptionService().transcribe(audioURL: audioURL, token: token)
+            store.reviewRecording(audioURL: audioURL, transcript: transcript)
+            pendingAudioURL = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func continueManually() {
+        discardPendingRecording()
+        recorder.cancel()
+        store.reviewManually()
+    }
+
+    private func discardPendingRecording() {
+        guard let pendingAudioURL else { return }
+        try? FileManager.default.removeItem(at: pendingAudioURL)
+        self.pendingAudioURL = nil
     }
 
     private func openSettings() {

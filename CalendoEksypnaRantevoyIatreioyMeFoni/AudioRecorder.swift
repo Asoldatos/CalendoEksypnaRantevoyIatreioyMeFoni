@@ -4,39 +4,86 @@ import Observation
 
 @MainActor
 @Observable
-final class AudioRecorder {
+final class AudioRecorder: NSObject, AVAudioRecorderDelegate {
     enum RecorderError: LocalizedError {
-        case permissionDenied
+        case microphonePermissionDenied
         case couldNotStart
+        case recordingFailed
+        case recordingTooShort
 
         var errorDescription: String? {
             switch self {
-            case .permissionDenied: "Δεν δόθηκε πρόσβαση στο μικρόφωνο. Μπορείτε να την ενεργοποιήσετε από τις Ρυθμίσεις."
-            case .couldNotStart: "Η εγγραφή δεν μπόρεσε να ξεκινήσει. Δοκιμάστε ξανά."
+            case .microphonePermissionDenied:
+                "Δεν δόθηκε πρόσβαση στο μικρόφωνο. Ενεργοποιήστε την από τις Ρυθμίσεις."
+            case .couldNotStart:
+                "Δεν ήταν δυνατή η εκκίνηση του μικροφώνου. Κλείστε τυχόν κλήση ή άλλη εφαρμογή που το χρησιμοποιεί και δοκιμάστε ξανά."
+            case .recordingFailed:
+                "Η εγγραφή δεν αποθηκεύτηκε σωστά. Δοκιμάστε ξανά."
+            case .recordingTooShort:
+                "Δεν καταγράφηκε αρκετός ήχος. Μιλήστε για τουλάχιστον ένα τέταρτο του δευτερολέπτου και δοκιμάστε ξανά."
             }
         }
     }
 
     var isRecording = false
     var isPaused = false
-    var isInterrupted = false
     var elapsed: TimeInterval = 0
     var level: Float = 0
+    var runtimeError: String?
 
     private var recorder: AVAudioRecorder?
     private var timer: Timer?
     private var outputURL: URL?
 
     func requestPermissionAndStart() async throws {
-        let granted = await AVAudioApplication.requestRecordPermission()
-        guard granted else { throw RecorderError.permissionDenied }
-        try start()
+        guard await AVAudioApplication.requestRecordPermission() else {
+            throw RecorderError.microphonePermissionDenied
+        }
+        cancel()
+        try prepareRecordingDirectory()
+        try configureAudioSession()
+
+        let fileURL = LocalDraftRepository.recordingsDirectory
+            .appendingPathComponent("appointment-\(UUID().uuidString).m4a")
+        let settings: [String: Any] = [
+            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+            AVSampleRateKey: 44_100,
+            AVNumberOfChannelsKey: 1,
+            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+        ]
+
+        do {
+            let recorder = try AVAudioRecorder(url: fileURL, settings: settings)
+            recorder.delegate = self
+            recorder.isMeteringEnabled = true
+            guard recorder.prepareToRecord(), recorder.record() else {
+                throw RecorderError.couldNotStart
+            }
+            self.recorder = recorder
+            outputURL = fileURL
+            isRecording = true
+            isPaused = false
+            elapsed = 0
+            runtimeError = nil
+            startMetering()
+        } catch let error as RecorderError {
+            cleanupFailedRecording(at: fileURL)
+            throw error
+        } catch {
+            NSLog("Calendo microphone recording setup failed: %@", error.localizedDescription)
+            cleanupFailedRecording(at: fileURL)
+            throw RecorderError.couldNotStart
+        }
     }
 
     func togglePause() {
-        guard let recorder else { return }
+        guard let recorder, isRecording else { return }
         if isPaused {
-            recorder.record()
+            guard recorder.record() else {
+                runtimeError = RecorderError.recordingFailed.errorDescription
+                cancel()
+                return
+            }
             isPaused = false
         } else {
             recorder.pause()
@@ -44,107 +91,85 @@ final class AudioRecorder {
         }
     }
 
-    func finish() -> URL? {
-        recorder?.stop()
-        stopTimer()
+    func finish() throws -> URL {
+        guard let recorder, let outputURL else { throw RecorderError.recordingFailed }
+        let duration = recorder.currentTime
+        recorder.stop()
+        stopMetering()
         isRecording = false
         isPaused = false
-        deactivateSession()
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+
+        self.recorder = nil
+        self.outputURL = nil
+        let fileSize = (try? outputURL.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+        guard duration >= 0.25,
+              FileManager.default.fileExists(atPath: outputURL.path),
+              fileSize > 256 else {
+            cleanupFailedRecording(at: outputURL)
+            throw RecorderError.recordingTooShort
+        }
         return outputURL
     }
 
     func cancel() {
-        let url = finish()
-        if let url { try? FileManager.default.removeItem(at: url) }
-        outputURL = nil
-    }
-
-    func handleBackgrounding() -> URL? {
-        guard isRecording else { return nil }
-        isInterrupted = true
-        return finish()
-    }
-
-    private func start() throws {
-        let directory = LocalDraftRepository.recordingsDirectory
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        let url = directory.appendingPathComponent("\(UUID().uuidString).m4a")
-        let session = AVAudioSession.sharedInstance()
-        try configure(session)
-        guard session.isInputAvailable else { throw RecorderError.couldNotStart }
-        let settings: [String: Any] = [
-            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 44_100,
-            AVNumberOfChannelsKey: 1,
-            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
-        ]
-        let recorder = try AVAudioRecorder(url: url, settings: settings)
-        recorder.isMeteringEnabled = true
-        guard recorder.record() else { throw RecorderError.couldNotStart }
-        try? FileManager.default.setAttributes([.protectionKey: FileProtectionType.complete], ofItemAtPath: url.path)
-        self.recorder = recorder
-        outputURL = url
-        elapsed = 0
-        isRecording = true
+        recorder?.stop()
+        recorder = nil
+        stopMetering()
+        isRecording = false
         isPaused = false
-        isInterrupted = false
-        startTimer()
+        if let outputURL { cleanupFailedRecording(at: outputURL) }
+        outputURL = nil
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 
-    private func configure(_ session: AVAudioSession) throws {
-        do {
-            // The minimal route is the most reliable capture configuration across iPhones.
-            try session.setCategory(.record, mode: .default, options: [])
-            try session.setActive(true, options: .notifyOthersOnDeactivation)
-        } catch {
-            NSLog("Calendo minimal microphone route failed: %@", error.localizedDescription)
-            // Bluetooth/headphone routes occasionally require the broader category.
-            try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
-            try session.setActive(true, options: .notifyOthersOnDeactivation)
+    func handleBackgrounding() {
+        guard isRecording else { return }
+        runtimeError = "Η εγγραφή σταμάτησε επειδή το Calendo πέρασε στο παρασκήνιο."
+        cancel()
+    }
+
+    nonisolated func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
+        Task { @MainActor [weak self] in
+            if let error { NSLog("Calendo audio encoding failed: %@", error.localizedDescription) }
+            self?.runtimeError = RecorderError.recordingFailed.errorDescription
+            self?.cancel()
         }
     }
 
-    private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 0.12, repeats: true) { [weak self] _ in
+    private func configureAudioSession() throws {
+        let session = AVAudioSession.sharedInstance()
+        try session.setCategory(.record, mode: .default, options: [])
+        try session.setActive(true)
+    }
+
+    private func prepareRecordingDirectory() throws {
+        try FileManager.default.createDirectory(
+            at: LocalDraftRepository.recordingsDirectory,
+            withIntermediateDirectories: true
+        )
+    }
+
+    private func startMetering() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 0.08, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
-                guard let self, let recorder = self.recorder else { return }
-                if !self.isPaused { self.elapsed = recorder.currentTime }
+                guard let self, let recorder = self.recorder, recorder.isRecording else { return }
                 recorder.updateMeters()
-                let power = recorder.averagePower(forChannel: 0)
-                self.level = max(0.08, min(1, (power + 55) / 55))
+                self.elapsed = recorder.currentTime
+                let decibels = recorder.averagePower(forChannel: 0)
+                self.level = max(0.08, min(1, pow(10, decibels / 28)))
             }
         }
     }
 
-    private func stopTimer() {
+    private func stopMetering() {
         timer?.invalidate()
         timer = nil
         level = 0
     }
 
-    private func deactivateSession() {
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-    }
-}
-
-@MainActor
-@Observable
-final class AudioPreviewPlayer {
-    var isPlaying = false
-    private var player: AVAudioPlayer?
-
-    func toggle(url: URL) {
-        if isPlaying {
-            player?.stop()
-            isPlaying = false
-            return
-        }
-        do {
-            player = try AVAudioPlayer(contentsOf: url)
-            player?.play()
-            isPlaying = true
-        } catch {
-            isPlaying = false
-        }
+    private func cleanupFailedRecording(at url: URL) {
+        try? FileManager.default.removeItem(at: url)
     }
 }
