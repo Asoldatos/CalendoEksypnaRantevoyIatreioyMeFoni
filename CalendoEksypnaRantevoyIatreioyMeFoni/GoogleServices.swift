@@ -176,17 +176,36 @@ struct GroqTranscriptionService {
     func transcribe(audioURL: URL, token: String) async throws -> String {
         var request = URLRequest(url: URL(string: "https://cbmjymirgxevmyzyedqr.supabase.co/functions/v1/transcribe-appointment-audio")!)
         request.httpMethod = "POST"
-        request.timeoutInterval = 120
+        request.timeoutInterval = 140
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("audio/mp4", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try Data(contentsOf: audioURL, options: .mappedIfSafe)
+        let fileSize = try audioURL.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
+        guard fileSize >= 1_024 else {
+            throw CloudProcessingError.service("Η εγγραφή δεν αποθηκεύτηκε σωστά. Δημιουργήστε νέα εγγραφή.")
+        }
+        guard fileSize <= 25 * 1_024 * 1_024 else {
+            throw CloudProcessingError.service("Η εγγραφή υπερβαίνει τα 25 MB. Δημιουργήστε πιο σύντομη εγγραφή.")
+        }
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await URLSession.shared.upload(for: request, fromFile: audioURL)
+        } catch let error as URLError {
+            switch error.code {
+            case .timedOut:
+                throw CloudProcessingError.service("Η μεταγραφή άργησε να απαντήσει. Η εγγραφή διατηρήθηκε· δοκιμάστε ξανά.")
+            case .networkConnectionLost, .notConnectedToInternet:
+                throw CloudProcessingError.service("Η σύνδεση διακόπηκε. Η εγγραφή διατηρήθηκε· δοκιμάστε ξανά.")
+            default:
+                throw CloudProcessingError.service("Η αποστολή της εγγραφής απέτυχε (κωδικός \(error.code.rawValue)). Δοκιμάστε ξανά.")
+            }
+        }
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         guard status == 200 else {
-            let message = (try? JSONDecoder().decode(CloudFailure.self, from: data).error)
-                ?? "Η μετατροπή της ομιλίας απέτυχε (κωδικός \(status))."
-            throw CloudProcessingError.service(message)
+            let failure = try? JSONDecoder().decode(CloudFailure.self, from: data)
+            let message = failure?.error ?? "Η μετατροπή της ομιλίας απέτυχε."
+            throw CloudProcessingError.service("\(message) (κωδικός \(status))")
         }
         guard let result = try? JSONDecoder().decode(GroqTranscript.self, from: data),
               !result.transcript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -200,7 +219,7 @@ struct GroqAppointmentService {
     func analyze(transcript: String, token: String) async throws -> AIAppointmentResult {
         var request = URLRequest(url: URL(string: "https://cbmjymirgxevmyzyedqr.supabase.co/functions/v1/process-appointment-audio")!)
         request.httpMethod = "POST"
-        request.timeoutInterval = 45
+        request.timeoutInterval = 110
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: [
