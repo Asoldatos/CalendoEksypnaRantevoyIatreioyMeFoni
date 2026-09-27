@@ -47,7 +47,7 @@ struct SavedView: View {
 
     private var privacyNote: some View {
         Label {
-            Text("Η σύνδεση Gemini και Google Calendar θα προστεθεί στο επόμενο ασφαλές στάδιο. Δεν έγινε απομακρυσμένη αποστολή.")
+            Text("Το ραντεβού προστέθηκε στο Google Calendar. Η προσωρινή εγγραφή αφαιρέθηκε από τη συσκευή.")
         } icon: {
             Image(systemName: "lock.shield.fill")
         }

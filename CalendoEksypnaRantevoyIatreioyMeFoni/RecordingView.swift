@@ -73,7 +73,7 @@ struct RecordingView: View {
             Text(isTranscribing ? "Μετατροπή σε κείμενο…" : "Μιλήστε φυσικά στα ελληνικά")
                 .font(.title2.bold())
             Text(isTranscribing
-                 ? "Το AssemblyAI μετατρέπει με ασφάλεια την εγγραφή σας."
+                 ? "Η εγγραφή μετατρέπεται με ασφάλεια σε ελληνικό κείμενο μέσω Groq."
                  : "«Αύριο στις δέκα, Μαρία Κωνσταντίνου, για σαράντα πέντε λεπτά»")
                 .font(.body)
                 .foregroundStyle(.secondary)
@@ -106,7 +106,7 @@ struct RecordingView: View {
     }
 
     private var recordingStatus: String {
-        if isTranscribing { return "Μετατροπή με AssemblyAI" }
+        if isTranscribing { return "Μετατροπή με Groq" }
         if !recorder.isRecording { return "Προετοιμασία μικροφώνου" }
         return recorder.isPaused ? "Σε παύση" : "Ηχογράφηση"
     }
@@ -144,7 +144,7 @@ struct RecordingView: View {
         defer { isTranscribing = false }
         do {
             let token = try await store.google.validAccessToken()
-            let transcript = try await AssemblyAITranscriptionService().transcribe(audioURL: audioURL, token: token)
+            let transcript = try await GroqTranscriptionService().transcribe(audioURL: audioURL, token: token)
             store.reviewRecording(audioURL: audioURL, transcript: transcript)
             pendingAudioURL = nil
         } catch {

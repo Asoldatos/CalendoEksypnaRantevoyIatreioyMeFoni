@@ -46,7 +46,7 @@ struct ReviewView: View {
     }
 
     private var analysisProgress: some View {
-        HStack(spacing: 12) { ProgressView(); Text("Το Gemini οργανώνει τα στοιχεία της μεταγραφής…").font(.subheadline) }
+        HStack(spacing: 12) { ProgressView(); Text("Το Groq οργανώνει τα στοιχεία της μεταγραφής…").font(.subheadline) }
             .frame(maxWidth: .infinity, alignment: .leading).clinicalCard()
     }
 
@@ -89,11 +89,11 @@ struct ReviewView: View {
 
     private func transcriptCard(_ transcript: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("ΜΕΤΑΓΡΑΦΗ ASSEMBLYAI", systemImage: "text.quote")
+            Label("ΜΕΤΑΓΡΑΦΗ ΦΩΝΗΣ", systemImage: "text.quote")
                 .font(.caption.bold()).foregroundStyle(CalendoColor.teal)
             Text(transcript)
                 .font(.subheadline).foregroundStyle(.secondary)
-            Text("Η εγγραφή μεταγράφηκε από το AssemblyAI. Μόνο αυτό το κείμενο οργανώνεται από το Gemini.")
+            Text("Η εγγραφή μεταγράφηκε με Groq. Μόνο αυτό το κείμενο χρησιμοποιείται για να οργανωθεί το ραντεβού.")
                 .font(.caption).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -116,9 +116,9 @@ struct ReviewView: View {
         defer { isAnalyzing = false }
 
         do {
-            // AssemblyAI creates the transcript; Gemini receives only text.
+            // Groq's transcription service creates the transcript; parsing receives only text.
             let token = try await store.google.validAccessToken()
-            let result = try await GeminiAppointmentService().analyze(transcript: transcript, token: token)
+            let result = try await GroqAppointmentService().analyze(transcript: transcript, token: token)
             store.applyAI(result, to: &draft)
         } catch {
             self.error = error.localizedDescription + "\n\nΜπορείτε να συμπληρώσετε ή να διορθώσετε τα πεδία χειροκίνητα."

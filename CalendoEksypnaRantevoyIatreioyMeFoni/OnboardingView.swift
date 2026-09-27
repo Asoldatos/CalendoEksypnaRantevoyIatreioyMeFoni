@@ -37,7 +37,7 @@ struct OnboardingView: View {
     private var privacyCard: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "lock.shield.fill").foregroundStyle(CalendoColor.teal)
-            Text("Με τη συγκατάθεσή σας, η προσωρινή ηχογράφηση αναλύεται με Gemini για να βρεθούν όνομα, ημερομηνία, ώρα και διάρκεια. Δεν διατηρείται στον server μετά την ανάλυση.")
+            Text("Με τη συγκατάθεσή σας, η εγγραφή μεταγράφεται στα ελληνικά από το Groq. Μόνο το κείμενο αναλύεται για τα στοιχεία ραντεβού. Η εγγραφή δεν αποθηκεύεται στον server του Calendo.")
                 .font(.footnote).foregroundStyle(.secondary)
         }.clinicalCard()
     }

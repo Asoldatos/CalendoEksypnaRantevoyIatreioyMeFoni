@@ -1,2 +1,2 @@
 // Apple Speech Recognition was intentionally removed.
-// AssemblyAI is the only speech-to-text provider used by Calendo.
+// Calendo uses the secure Groq transcription service instead.
